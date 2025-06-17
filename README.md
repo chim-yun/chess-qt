@@ -10,6 +10,7 @@ Features include:
 - Ten minute timers per side
 - Placeholder for Stockfish integration
 
+
 Build with CMake and Qt5 development packages:
 
 ```bash

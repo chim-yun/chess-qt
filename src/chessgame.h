@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <QTime>
 
+
 enum class PieceType { None, Pawn, Knight, Bishop, Rook, Queen, King };
 enum class Color { White, Black };
 
@@ -19,8 +20,10 @@ public:
     explicit ChessGame(bool vsAI = false, Color aiColor = Color::Black, QWidget* parent = nullptr);
     QSize sizeHint() const override { return QSize(512,512); }
 
+
 signals:
     void gameOver();
+
 
 private:
     QVector<Piece> board;
@@ -39,6 +42,12 @@ private:
     void movePiece(int from, int to);
     void checkTimers();
     void endGame(const QString& winner);
+    QTimer whiteTimer;
+    QTimer blackTimer;
+
+    void setupBoard();
+    void loadAI();
+
 protected:
     void paintEvent(QPaintEvent*) override;
     void mousePressEvent(QMouseEvent*) override;

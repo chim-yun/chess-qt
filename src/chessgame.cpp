@@ -12,6 +12,13 @@ ChessGame::ChessGame(bool vsAI, Color aiColor, QWidget* parent)
     connect(&tick, &QTimer::timeout, this, &ChessGame::checkTimers);
     tick.start();
     if(vsAI) loadAI();
+
+
+ChessGame::ChessGame(bool vsAI, Color aiColor, QWidget* parent)
+    : QWidget(parent), board(64), turn(Color::White), vsAI(vsAI), aiColor(aiColor) {
+    setupBoard();
+    whiteTimer.start(1000*60*10);
+    blackTimer.start(1000*60*10);
 }
 
 void ChessGame::setupBoard() {
@@ -106,6 +113,7 @@ void ChessGame::endGame(const QString& winner){
     QMessageBox::information(this, "Game Over", winner + " wins");
     emit gameOver();
     close();
+    // TODO: connect to Stockfish using QProcess
 }
 
 void ChessGame::paintEvent(QPaintEvent*) {
@@ -122,6 +130,9 @@ void ChessGame::paintEvent(QPaintEvent*) {
                 p.fillRect(c*squareSize, r*squareSize, squareSize, squareSize, QColor(246,246,105,120));
             if (idx==selected)
                 p.fillRect(c*squareSize, r*squareSize, squareSize, squareSize, QColor(186,202,68,120));
+
+            const Piece& piece = board[r*8+c];
+
             if (piece.type != PieceType::None) {
                 QString filename;
                 QString colorPrefix = piece.color == Color::White ? "_w" : "_b";
@@ -141,6 +152,7 @@ void ChessGame::paintEvent(QPaintEvent*) {
             }
         }
     }
+
     p.setPen(Qt::black);
     p.drawText(rect(), Qt::AlignBottom | Qt::AlignLeft, whiteTime.toString("mm:ss"));
     p.drawText(rect(), Qt::AlignTop | Qt::AlignLeft, blackTime.toString("mm:ss"));
@@ -164,5 +176,11 @@ void ChessGame::mousePressEvent(QMouseEvent* ev) {
         }
     }
     update();
+
+}
+
+void ChessGame::mousePressEvent(QMouseEvent* ev) {
+    // TODO: handle piece selection and move highlighting
+
 }
 
