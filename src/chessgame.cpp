@@ -12,6 +12,7 @@ ChessGame::ChessGame(bool vsAI, Color aiColor, QWidget* parent)
     connect(&tick, &QTimer::timeout, this, &ChessGame::checkTimers);
     tick.start();
     if(vsAI) loadAI();
+
 }
 
 void ChessGame::setupBoard() {
@@ -32,6 +33,7 @@ void ChessGame::setupBoard() {
 }
 
 void ChessGame::loadAI() {
+
     // Placeholder for AI connection
     // In a full implementation we would start Stockfish and communicate via UCI
 }
@@ -122,6 +124,7 @@ void ChessGame::paintEvent(QPaintEvent*) {
                 p.fillRect(c*squareSize, r*squareSize, squareSize, squareSize, QColor(246,246,105,120));
             if (idx==selected)
                 p.fillRect(c*squareSize, r*squareSize, squareSize, squareSize, QColor(186,202,68,120));
+
             if (piece.type != PieceType::None) {
                 QString filename;
                 QString colorPrefix = piece.color == Color::White ? "_w" : "_b";
@@ -141,6 +144,7 @@ void ChessGame::paintEvent(QPaintEvent*) {
             }
         }
     }
+
     p.setPen(Qt::black);
     p.drawText(rect(), Qt::AlignBottom | Qt::AlignLeft, whiteTime.toString("mm:ss"));
     p.drawText(rect(), Qt::AlignTop | Qt::AlignLeft, blackTime.toString("mm:ss"));

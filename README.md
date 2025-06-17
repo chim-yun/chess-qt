@@ -1,5 +1,6 @@
 # Chess Qt
 
+
 This project implements a Qt-based chess program in C++.
 Features include:
 
@@ -9,6 +10,7 @@ Features include:
 - Simple move generation and highlight of legal moves
 - Ten minute timers per side
 - Placeholder for Stockfish integration
+
 
 Build with CMake and Qt5 development packages:
 
