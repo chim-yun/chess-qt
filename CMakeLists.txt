@@ -6,7 +6,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_CXX_STANDARD 17)
 
-find_package(Qt5 COMPONENTS Widgets Sql REQUIRED)
+find_package(Qt6 COMPONENTS Widgets Sql REQUIRED)
 
 add_executable(chess-qt
     src/main.cpp
@@ -17,5 +17,5 @@ add_executable(chess-qt
 )
 
 target_include_directories(chess-qt PRIVATE src)
-target_link_libraries(chess-qt Qt5::Widgets Qt5::Sql)
+target_link_libraries(chess-qt Qt6::Widgets Qt6::Sql)
 
