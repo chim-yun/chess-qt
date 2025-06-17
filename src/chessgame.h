@@ -14,6 +14,10 @@ struct Piece {
     Color color;
 };
 
+constexpr Color opposite(Color c) {
+    return c == Color::White ? Color::Black : Color::White;
+}
+
 class ChessGame : public QWidget {
     Q_OBJECT
 public:
@@ -37,6 +41,7 @@ private:
     int selected;
     QVector<int> highlights;
 
+    static QVector<Piece> createInitialBoard();
     void setupBoard();
     void loadAI();
     QVector<int> validMoves(int idx) const;
