@@ -1,0 +1,8 @@
+/build
+*.o
+*.a
+*.so
+cmake-build*/
+*.user
+*.pro.user
+*.db
