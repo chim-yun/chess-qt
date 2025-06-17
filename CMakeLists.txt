@@ -12,6 +12,7 @@ add_executable(chess-qt
     src/main.cpp
     src/login.cpp
     src/chessgame.cpp
+    src/startdialog.cpp
     resources/resources.qrc
 )
 
