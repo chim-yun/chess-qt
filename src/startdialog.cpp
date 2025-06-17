@@ -1,5 +1,6 @@
 #include "startdialog.h"
 #include <QVBoxLayout>
+#include <QRandomGenerator>
 
 StartDialog::StartDialog(QWidget* parent) : QDialog(parent), chosenMode(GameMode::TwoPlayer), chosenColor(Color::White) {
     setWindowTitle("New Game");
@@ -25,7 +26,7 @@ void StartDialog::acceptGame() {
     chosenMode = aiRadio->isChecked() ? GameMode::VsAI : GameMode::TwoPlayer;
     int data = colorBox->currentData().toInt();
     if (data == -1) {
-        chosenColor = (qrand() % 2) ? Color::White : Color::Black;
+        chosenColor = (QRandomGenerator::global()->bounded(2)) ? Color::White : Color::Black;
     } else {
         chosenColor = static_cast<Color>(data);
     }

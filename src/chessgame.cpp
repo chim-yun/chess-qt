@@ -3,11 +3,29 @@
 #include <QMouseEvent>
 #include <QMessageBox>
 #include <algorithm>
+#include <array>
+
+QVector<Piece> ChessGame::createInitialBoard() {
+    QVector<Piece> b(64, {PieceType::None, Color::White});
+    auto place = [&](int idx, PieceType t, Color c) { b[idx] = {t, c}; };
+    for (int i = 8; i < 16; ++i) place(i, PieceType::Pawn, Color::White);
+    for (int i = 48; i < 56; ++i) place(i, PieceType::Pawn, Color::Black);
+    for (int i : {0,7}) place(i, PieceType::Rook, Color::White);
+    for (int i : {56,63}) place(i, PieceType::Rook, Color::Black);
+    for (int i : {1,6}) place(i, PieceType::Knight, Color::White);
+    for (int i : {57,62}) place(i, PieceType::Knight, Color::Black);
+    for (int i : {2,5}) place(i, PieceType::Bishop, Color::White);
+    for (int i : {58,61}) place(i, PieceType::Bishop, Color::Black);
+    place(3, PieceType::Queen, Color::White);
+    place(59, PieceType::Queen, Color::Black);
+    place(4, PieceType::King, Color::White);
+    place(60, PieceType::King, Color::Black);
+    return b;
+}
 
 ChessGame::ChessGame(bool vsAI, Color aiColor, QWidget* parent)
-    : QWidget(parent), board(64), turn(Color::White), vsAI(vsAI), aiColor(aiColor),
+    : QWidget(parent), board(createInitialBoard()), turn(Color::White), vsAI(vsAI), aiColor(aiColor),
       whiteTime(0,10,0), blackTime(0,10,0), selected(-1) {
-    setupBoard();
     tick.setInterval(1000);
     connect(&tick, &QTimer::timeout, this, &ChessGame::checkTimers);
     tick.start();
@@ -16,20 +34,7 @@ ChessGame::ChessGame(bool vsAI, Color aiColor, QWidget* parent)
 }
 
 void ChessGame::setupBoard() {
-    // Simplified starting position
-    // Pawns
-    for (int i=8;i<16;i++) board[i] = {PieceType::Pawn, Color::White};
-    for (int i=48;i<56;i++) board[i] = {PieceType::Pawn, Color::Black};
-    board[0] = board[7] = {PieceType::Rook, Color::White};
-    board[56] = board[63] = {PieceType::Rook, Color::Black};
-    board[1] = board[6] = {PieceType::Knight, Color::White};
-    board[57] = board[62] = {PieceType::Knight, Color::Black};
-    board[2] = board[5] = {PieceType::Bishop, Color::White};
-    board[58] = board[61] = {PieceType::Bishop, Color::Black};
-    board[3] = {PieceType::Queen, Color::White};
-    board[59] = {PieceType::Queen, Color::Black};
-    board[4] = {PieceType::King, Color::White};
-    board[60] = {PieceType::King, Color::Black};
+    board = createInitialBoard();
 }
 
 void ChessGame::loadAI() {
@@ -64,24 +69,26 @@ QVector<int> ChessGame::validMoves(int idx) const {
                 moves.append(nr*8+cc);
         }
         break;}
-    case PieceType::Knight:
-        for(auto pr: {std::pair<int,int>{-2,-1},{-2,1},{-1,-2},{-1,2},{1,-2},{1,2},{2,-1},{2,1}})
-            add(r+pr.first,c+pr.second);
-        break;
+    case PieceType::Knight: {
+        static const std::array<std::pair<int,int>,8> dirs{{{-2,-1},{-2,1},{-1,-2},{-1,2},{1,-2},{1,2},{2,-1},{2,1}}};
+        for(auto [dr,dc] : dirs)
+            add(r+dr,c+dc);
+        break;}
     case PieceType::Bishop:
-        for(int dr:{-1,1}) for(int dc:{-1,1})
+        for(auto [dr,dc] : std::array<std::pair<int,int>,4>{{{1,1},{1,-1},{-1,1},{-1,-1}}})
             for(int k=1;k<8;k++){int rr=r+dr*k,cc=c+dc*k; if(rr<0||rr>=8||cc<0||cc>=8) break; if(board[rr*8+cc].type==PieceType::None){moves.append(rr*8+cc); continue;} if(board[rr*8+cc].color!=p.color) moves.append(rr*8+cc); break;}
         break;
     case PieceType::Rook:
-        for(auto pr: {std::pair<int,int>{1,0},{-1,0},{0,1},{0,-1}})
-            for(int k=1;k<8;k++){int rr=r+pr.first*k,cc=c+pr.second*k; if(rr<0||rr>=8||cc<0||cc>=8) break; if(board[rr*8+cc].type==PieceType::None){moves.append(rr*8+cc); continue;} if(board[rr*8+cc].color!=p.color) moves.append(rr*8+cc); break;}
+        for(auto [dr,dc] : std::array<std::pair<int,int>,4>{{{1,0},{-1,0},{0,1},{0,-1}}})
+            for(int k=1;k<8;k++){int rr=r+dr*k,cc=c+dc*k; if(rr<0||rr>=8||cc<0||cc>=8) break; if(board[rr*8+cc].type==PieceType::None){moves.append(rr*8+cc); continue;} if(board[rr*8+cc].color!=p.color) moves.append(rr*8+cc); break;}
         break;
     case PieceType::Queen:
-        for(auto pr: {std::pair<int,int>{1,0},{-1,0},{0,1},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}})
-            for(int k=1;k<8;k++){int rr=r+pr.first*k,cc=c+pr.second*k; if(rr<0||rr>=8||cc<0||cc>=8) break; if(board[rr*8+cc].type==PieceType::None){moves.append(rr*8+cc); continue;} if(board[rr*8+cc].color!=p.color) moves.append(rr*8+cc); break;}
+        for(auto [dr,dc] : std::array<std::pair<int,int>,8>{{{1,0},{-1,0},{0,1},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}}})
+            for(int k=1;k<8;k++){int rr=r+dr*k,cc=c+dc*k; if(rr<0||rr>=8||cc<0||cc>=8) break; if(board[rr*8+cc].type==PieceType::None){moves.append(rr*8+cc); continue;} if(board[rr*8+cc].color!=p.color) moves.append(rr*8+cc); break;}
         break;
     case PieceType::King:
-        for(int dr=-1;dr<=1;dr++) for(int dc=-1;dc<=1;dc++) if(dr||dc) add(r+dr,c+dc);
+        for(auto [dr,dc] : std::array<std::pair<int,int>,8>{{{1,0},{-1,0},{0,1},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}}})
+            add(r+dr,c+dc);
         break;
     default: break;
     }
@@ -92,8 +99,8 @@ void ChessGame::movePiece(int from, int to){
     board[to]=board[from];
     board[from]={PieceType::None,Color::White};
     selected=-1; highlights.clear();
-    turn = (turn==Color::White?Color::Black:Color::White);
-    if(std::none_of(board.begin(), board.end(), [&](const Piece&p){return p.type==PieceType::King && p.color==(turn==Color::White?Color::Black:Color::White);} ))
+    turn = opposite(turn);
+    if(std::none_of(board.begin(), board.end(), [&](const Piece&p){return p.type==PieceType::King && p.color==opposite(turn);} ))
         endGame(turn==Color::White?"White":"Black");
 }
 
